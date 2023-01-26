@@ -1,7 +1,11 @@
 ﻿using System.Text.RegularExpressions;
 
 class PasswordManager {
-    private static Regex rxValidator = new Regex("^[A-Za-z0-9]{8,}$");
+    private static Regex rxUpper = new Regex(@"[A-Z]+");
+    private static Regex rxLower = new Regex(@"[a-z]+");
+    private static Regex rxNumeric = new Regex(@"[0-9]+");
+    private static Regex rxSpecial = new Regex(@"[!@#$%^&*_+=-]+");
+    private static Regex rxWhitespace = new Regex(@"[ ]+");
 
     static void PrintWelcome() {
         char input;
@@ -32,7 +36,7 @@ class PasswordManager {
                         throw new Exception();
                 }
                 break;
-            } catch (Exception e) {
+            } catch (Exception) {
                 Console.WriteLine("Invalid Input. Try Again.");
             }
         }
@@ -45,42 +49,64 @@ class PasswordManager {
         string mpasswd;
         Console.WriteLine("\n****************************************");
         Console.WriteLine("Create A New Master Password");
-        Console.Write("Must contain at least: 1 Uppercase Letter, 1 Lowercase Letter, 1 Numeric Character, ");
-        Console.WriteLine(" 1 Special Character, and 8 total characters with no whitespace");
-        Console.WriteLine();
-        Console.WriteLine("NOTE: This password will not be saved. Please keep it somewhere safe.");
-        Console.Write("Enter your new Master Password: ");
-        mpasswd = Console.ReadLine();
-        Console.WriteLine($"Valid: {ValidMaster(mpasswd)}");
+        while (true) {
+            Console.WriteLine("Must contain at least:  1 Uppercase Letter, 1 Lowercase Letter,");
+            Console.WriteLine("\t\t\t1 Numeric Character, 1 Special Character,");
+            Console.WriteLine("\t\t\tand 8-15 characters in length");
+            Console.WriteLine();
+            Console.WriteLine("NOTE: This password will not be saved. Please keep it somewhere safe.");
+            Console.Write("Enter your new Master Password: ");
+            mpasswd = Console.ReadLine();
+            if (!ValidMaster(mpasswd)) {
+                Console.WriteLine("\nERROR: Invalid Master Password");
+                continue;
+            } else break;
+        }
 
     }
 
     static void EnterMaster() {
-
+        Console.WriteLine("TODO");
     }
 
     static bool ValidMaster(string master) {
-        return rxValidator.Match(master).Success;
+        return (ValidLength(master) &&
+                ValidUppercase(master) &&
+                ValidLowercase(master) &&
+                ValidNumeric(master) &&
+                ValidSpecial(master) &&
+                ValidWhitespace(master)
+                );
+    }
+
+    static bool ValidLength(string master) {
+        Console.WriteLine($"Length: {(master.Length >= 8 && master.Length <= 15)}");
+        return (master.Length >= 8 && master.Length <= 15);
     }
 
     static bool ValidUppercase(string master) {
-        return false;
+        Console.WriteLine($"Upper: {rxUpper.Match(master).Success}");
+        return rxUpper.Match(master).Success;
     }
 
     static bool ValidLowercase(string master) {
-        return false;
+        Console.WriteLine($"Lower: {rxLower.Match(master).Success}");
+        return rxLower.Match(master).Success;
     }
 
     static bool ValidNumeric(string master) {
-        return false;
+        Console.WriteLine($"Numeric: {rxNumeric.Match(master).Success}");
+        return rxNumeric.Match(master).Success;
     }
 
     static bool ValidSpecial(string master) {
-        return false;
+        Console.WriteLine($"Special: {rxSpecial.Match(master).Success}");
+        return rxSpecial.Match(master).Success;
     }
 
     static bool ValidWhitespace(string master) {
-        return false;
+        Console.WriteLine($"Whitespace: {!rxWhitespace.Match(master).Success}");
+        return !rxWhitespace.Match(master).Success;
     }
 
     static public void Main() {
