@@ -1,9 +1,14 @@
+#require 'tty'
+require 'tty-box'
+require 'sqlite3'
+
 WELCOME_MSG = [
     "\nWelcome to command-line Password Manager",
     "******************************************",
     "Enter your selection below",
     "[1] Create Master Password",
     "[2] Enter Master Password",
+    "[3] Exit",
 ]
 
 CREATE_MASTER_MSG = [
@@ -20,7 +25,7 @@ REGEX_HASH = {
     "rxLower" => /[a-z]+/,
     "rxNumeric" => /[0-9]+/,
     "rxSpecial" => /[!@#$%^&*_+=-]+/,
-    "rxWhitespace" => /[ ]+/,
+    "rxWhitespace" => /^\S*$/,
 }
 
 $failed_strings = {}
@@ -28,10 +33,14 @@ REGEX_HASH.each_key {|k|
     $failed_strings[k] = k.gsub("rx", "")
 }
 
+$exit = false
+
 def print_welcome()
     WELCOME_MSG.each {|line|
     puts(line)
     }
+    box = TTY::Box.frame "Drawing a box in", "terminal emulator", padding: 3, align: :center
+        print(box)
     create_master = false
     loop {
         begin
@@ -47,6 +56,9 @@ def print_welcome()
                 break
             when '2'
                 break
+            when '3'
+                $exit = true
+                break
             else
                 raise $!
             end
@@ -54,6 +66,7 @@ def print_welcome()
             puts("Invlid Input. Try Again.")
         end
     }
+    abort unless !$exit
     if create_master
         create_master_pass()
     else
@@ -73,6 +86,7 @@ def create_master_pass()
             puts("\nERROR: Invalid Master Password")
             next
         end
+        puts("Master Password Validated")
         break
     }
 end
